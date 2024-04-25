@@ -1,4 +1,5 @@
 using lesson55.Models;
+using lesson55.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,9 +13,41 @@ public class MyTaskController : Controller
     {
         _context = context;
     }
-    public IActionResult Index()
+    public IActionResult Index(TaskSortState sortState = TaskSortState.NameAsc)
     {
-        return View(_context.Tasks.ToList());
+        var tasks = _context.Tasks.ToList();
+        ViewBag.NameSort = sortState == TaskSortState.NameAsc ? TaskSortState.NameDesc : TaskSortState.NameAsc;
+        ViewBag.PrioritySort = sortState == TaskSortState.PriorityAsc ? TaskSortState.PriorityDesc : TaskSortState.PriorityAsc;
+        ViewBag.StatusSort = sortState == TaskSortState.StatusAsc ? TaskSortState.StatusDesc : TaskSortState.StatusAsc;
+        ViewBag.DateOfCreationSort = sortState == TaskSortState.DateOfCreationAsc ? TaskSortState.DateOfCreationDesc : TaskSortState.DateOfCreationAsc;
+        switch (sortState)
+        {
+            case TaskSortState.NameAsc:
+                tasks = tasks.OrderBy(t => t.Name).ToList();
+                break;
+            case TaskSortState.NameDesc:
+                tasks = tasks.OrderByDescending(t => t.Name).ToList();
+                break;
+            case TaskSortState.PriorityAsc:
+                tasks = tasks.OrderBy(t => SortFields(t.Priority)).ToList();
+                break;
+            case TaskSortState.PriorityDesc:
+                tasks = tasks.OrderByDescending(t => SortFields(t.Priority)).ToList();
+                break;
+            case TaskSortState.StatusAsc:
+                tasks = tasks.OrderBy(t => SortFields(t.Status)).ToList();
+                break;
+            case TaskSortState.StatusDesc:
+                tasks = tasks.OrderByDescending(t => SortFields(t.Status)).ToList();
+                break;
+            case TaskSortState.DateOfCreationAsc:
+                tasks = tasks.OrderBy(t => t.DateOfCreation).ToList();
+                break;
+            case TaskSortState.DateOfCreationDesc:
+                tasks = tasks.OrderByDescending(t => t.DateOfCreation).ToList();
+                break;
+        }
+        return View(tasks);
     }
 
     public IActionResult Create()
@@ -29,6 +62,7 @@ public class MyTaskController : Controller
         ViewBag.Priorities = new List<string>(){"Высокий", "Средний", "Низкий" };
         if (ModelState.IsValid)
         {
+            task.DateOfCreation = DateTime.Now.ToUniversalTime();
             _context.Tasks.Add(task);
             _context.SaveChanges();
             return RedirectToAction("Index");
@@ -93,5 +127,26 @@ public class MyTaskController : Controller
             return RedirectToAction("Index");
         }
         return NotFound();
+    }
+
+    private int SortFields(string field)
+    {
+        switch (field.ToLower())
+        {
+            case "высокий":
+                return 3;
+            case "средний":
+                return 2;
+            case "низкий":
+                return 1;
+            case "новая":
+                return 3;
+            case "открыта":
+                return 2;
+            case "закрыта":
+                return 1;
+            default:
+                return 0;
+        }
     }
 }
