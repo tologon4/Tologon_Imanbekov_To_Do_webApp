@@ -31,7 +31,11 @@
                     <td>@task.Name</td>
                     <td class="@PriorityColor(@task.Priority)">@task.Priority</td>
                     <td>@task.Status</td>
-                    <td><a asp-controller="MyTask" asp-action="MyTask" asp-route-id="@task.Id" type="button" class="btn btn-warning rounded-0 px-3 py-2 ">Детали</a></td>
+                    <td>
+                        <a asp-controller="MyTask" asp-action="MyTask" asp-route-id="@task.Id" type="button" class="btn btn-warning rounded-0 px-3 py-2 ">Детали</a>
+                        <a asp-controller="MyTask" asp-action="Delete" asp-route-id="@task.Id" type="button" class="btn btn-danger rounded-0 px-3 py-2 ">Удалить</a>
+                    </td>
+                    
                 </tr>
             }            
             </tbody>
