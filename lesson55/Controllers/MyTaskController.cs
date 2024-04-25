@@ -2,7 +2,7 @@ using lesson55.Models;
 using lesson55.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using lesson55.Models;
 namespace lesson55.Controllers;
 
 public class MyTaskController : Controller
@@ -13,9 +13,41 @@ public class MyTaskController : Controller
     {
         _context = context;
     }
-    public IActionResult Index(TaskSortState sortState = TaskSortState.NameAsc)
+    public IActionResult Index(string? priority, string? status, string? titleSearch, DateTime? dateFrom, DateTime? dateTo, string wordFilter,TaskSortState sortState = TaskSortState.NameAsc)
     {
-        var tasks = _context.Tasks.ToList();
+        ViewBag.Priorities = new List<string>() {"Высокий", "Средний", "Низкий" };
+        ViewBag.Statuses = new List<string>() { "Новая", "Открыта", "Закрыта" };
+        IQueryable<MyTask> filteredTasks = _context.Tasks;
+        /*DateTime? utcDateFrom = dateFrom.HasValue ? dateFrom.Value.ToUniversalTime() : null;
+        DateTime? utcDateTo = dateTo.HasValue ? dateTo.Value.ToUniversalTime() : null;*/
+        if (!string.IsNullOrEmpty(priority))
+        {
+            filteredTasks = filteredTasks.Where(t => t.Priority == priority);
+        }
+        if (!string.IsNullOrEmpty(status))
+        {
+            filteredTasks = filteredTasks.Where(t => t.Status == status);
+        }
+        if (!string.IsNullOrEmpty(titleSearch))
+        {
+            filteredTasks = filteredTasks.Where(t => t.Name.Equals(titleSearch));
+        }
+        if (!string.IsNullOrEmpty(wordFilter))
+        {
+            filteredTasks = filteredTasks.Where(t => t.Description.Contains(wordFilter.ToLower()));
+        }
+        if (dateFrom.HasValue)
+        {
+            dateFrom = dateFrom.Value.ToUniversalTime();
+            filteredTasks = filteredTasks.Where(t => t.DateOfCreation >= dateFrom);
+        }
+        if (dateTo.HasValue)
+        {
+            dateTo = dateTo.Value.ToUniversalTime();
+            filteredTasks = filteredTasks.Where(t => t.DateOfCreation <= dateTo);
+        }
+
+        var tasks = filteredTasks.ToList();
         ViewBag.NameSort = sortState == TaskSortState.NameAsc ? TaskSortState.NameDesc : TaskSortState.NameAsc;
         ViewBag.PrioritySort = sortState == TaskSortState.PriorityAsc ? TaskSortState.PriorityDesc : TaskSortState.PriorityAsc;
         ViewBag.StatusSort = sortState == TaskSortState.StatusAsc ? TaskSortState.StatusDesc : TaskSortState.StatusAsc;
