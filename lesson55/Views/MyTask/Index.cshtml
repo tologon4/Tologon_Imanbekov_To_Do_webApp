@@ -6,7 +6,55 @@
 }
 
 <h2>title</h2>
+
 <div class="row table_section">
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="row">
+            <div class="col-md-3 mb-2">
+                <label for="titleSearch" class="form-label">Заголовок:</label>
+                <input type="text" id="titleSearch" name="titleSearch" class="form-control" placeholder="Поиск по заголовку">
+            </div>
+            <div class="col-md-3 mb-2">
+                <label for="dateFrom" class="form-label">Дата создания от:</label>
+                <input type="date" id="dateFrom" name="dateFrom" class="form-control">
+            </div>
+            <div class="col-md-3 mb-2">
+                <label for="dateTo" class="form-label">Дата создания до:</label>
+                <input type="date" id="dateTo" name="dateTo" class="form-control">
+            </div>
+            <div class="col-md-3 mb-2">
+                <label for="wordFilter" class="form-label">Фильтр по словам:</label>
+                <input type="text" id="wordFilter" name="wordFilter" class="form-control" placeholder="Поиск по описанию">
+            </div>
+            <div class="col-md-4 mb-2">
+                <label for="priority" class="form-label">Приоритет</label>
+                <select id="priority" name="priority" class="form-select">
+                    <option value="">Все приоритеты</option>
+                    @foreach (var priority in ViewBag.Priorities)
+                    {
+                        <option value="@priority">@priority</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="col-md-4 mb-2">
+                <label for="status" class="form-label">Статус</label>
+                <select id="status" name="status" class="form-select">
+                    <option value="">Все статусы</option>
+                    @foreach (var statuses in ViewBag.Statuses)
+                    {
+                        <option value="@statuses">@statuses</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary my-2">Применить фильтр</button>
+            </div>
+        </div>
+    </form>
+    
+    
     @if (@Model.Count == 0)
     {
         <p>Пока что, задач еще нет!</p>
@@ -22,7 +70,7 @@
                 <th><a asp-action="Index" asp-route-sortState="@ViewBag.StatusSort">Статус</a></th>
                 <th><a asp-action="Index" asp-route-sortState="@ViewBag.DateOfCreationSort">Дата создания</a></th>
                 <th>Действия</th>
-            </tr>            
+            </tr>
             </thead>
             <tbody>
             @foreach (var task in @Model)
@@ -37,9 +85,9 @@
                         <a asp-controller="MyTask" asp-action="MyTask" asp-route-id="@task.Id" type="button" class="btn btn-warning rounded-0 px-3 py-2 ">Детали</a>
                         <a asp-controller="MyTask" asp-action="Delete" asp-route-id="@task.Id" type="button" class="btn btn-danger rounded-0 px-3 py-2 ">Удалить</a>
                     </td>
-                    
+
                 </tr>
-            }            
+            }
             </tbody>
         </table>
     }
