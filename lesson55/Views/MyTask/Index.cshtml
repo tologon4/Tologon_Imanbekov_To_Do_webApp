@@ -1,4 +1,4 @@
-@model TModel
+@model List<MyTask>
 
 @{
     ViewBag.Title = "title";
@@ -6,3 +6,52 @@
 }
 
 <h2>title</h2>
+<div class="row table_section">
+    @if (@Model.Count == 0)
+    {
+        <p>Пока что, задач еще нет!</p>
+    }
+    else
+    {
+        <table class="table table-light table-striped">
+            <thead>
+            <tr>
+                <th>Номер</th>
+                <th>Название задачи</th>
+                <th>Приоритет</th>
+                <th>Статус</th>
+                <th>Действия</th>
+            </tr>            
+            </thead>
+            <tbody>
+            @foreach (var task in @Model)
+            {
+                <tr>
+                    <td>@task.Id</td>
+                    <td>@task.Name</td>
+                    <td class="@PriorityColor(@task.Priority)">@task.Priority</td>
+                    <td>@task.Status</td>
+                    <td><a asp-controller="MyTask" asp-action="MyTask" asp-route-id="@task.Id" type="button" class="btn btn-warning rounded-0 px-3 py-2 ">Детали</a></td>
+                </tr>
+            }            
+            </tbody>
+        </table>
+    }
+</div>
+
+@functions{
+    public string PriorityColor(string priority)
+    {
+        switch (priority)
+        {
+            case "Высокий":
+                return "text-danger";
+            case "Средний":
+                return "text-primary";
+            case "Низкий":
+                return "text-success";
+            default:
+                return "";
+        }
+    }
+}
