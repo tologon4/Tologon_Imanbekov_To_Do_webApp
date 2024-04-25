@@ -17,9 +17,10 @@
             <thead>
             <tr>
                 <th>Номер</th>
-                <th>Название задачи</th>
-                <th>Приоритет</th>
-                <th>Статус</th>
+                <th><a asp-action="Index" asp-route-sortState="@ViewBag.NameSort">Название задачи</a></th>
+                <th><a asp-action="Index" asp-route-sortState="@ViewBag.PrioritySort">Приоритет</a></th>
+                <th><a asp-action="Index" asp-route-sortState="@ViewBag.StatusSort">Статус</a></th>
+                <th><a asp-action="Index" asp-route-sortState="@ViewBag.DateOfCreationSort">Дата создания</a></th>
                 <th>Действия</th>
             </tr>            
             </thead>
@@ -31,6 +32,7 @@
                     <td>@task.Name</td>
                     <td class="@PriorityColor(@task.Priority)">@task.Priority</td>
                     <td>@task.Status</td>
+                    <td>@task.DateOfCreation</td>
                     <td>
                         <a asp-controller="MyTask" asp-action="MyTask" asp-route-id="@task.Id" type="button" class="btn btn-warning rounded-0 px-3 py-2 ">Детали</a>
                         <a asp-controller="MyTask" asp-action="Delete" asp-route-id="@task.Id" type="button" class="btn btn-danger rounded-0 px-3 py-2 ">Удалить</a>

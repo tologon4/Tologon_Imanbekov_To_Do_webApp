@@ -11,6 +11,6 @@ public class MyTask
     public string Priority { get; set; }
     public string Status { get; set; }
     [Required(ErrorMessage = "Заполните ячейку")]
-    public DateTime? DateOfCreation { get; set; }
     public string Description { get; set; }
+    public DateTime? DateOfCreation { get; set; }
 }
