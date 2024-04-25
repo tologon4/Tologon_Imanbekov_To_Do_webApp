@@ -1,7 +1,7 @@
 @model MyTask
 
 @{
-    ViewBag.Title = "title";
+    ViewBag.Title = "Task Create";
     Layout = "_Layout";
 }
 
@@ -31,6 +31,7 @@
                 <textarea id="descr" placeholder="Подробное описание" class="form-control form-control-lg mt-3  h-100" asp-for="Description" type="text" rows="3"></textarea>
             </div>
             <input asp-for="Status" value="Новая" type="hidden"/>
+            <input asp-for="DateOfCreation" value="@DateTime.UtcNow" type="hidden"/>
             <button type="submit" class="btn btn-success mt-5 px-3">Добавить Задачу</button>
         </div>
     </div>

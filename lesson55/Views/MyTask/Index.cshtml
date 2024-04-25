@@ -1,7 +1,7 @@
 @model List<MyTask>
 
 @{
-    ViewBag.Title = "title";
+    ViewBag.Title = "Tasks";
     Layout = "_Layout";
 }
 
@@ -82,8 +82,10 @@
                     <td>@task.Status</td>
                     <td>@task.DateOfCreation</td>
                     <td>
+                        @if (task.Status == "Новая") { <a asp-controller="MyTask" asp-action="Open" asp-route-id="@task.Id" type="button" class="btn btn-success rounded-0 px-3 py-2 ">Открыть</a> }
+                        else if (task.Status=="Открыта") { <a asp-controller="MyTask" asp-action="Close" asp-route-id="@task.Id" type="button" class="btn btn-primary rounded-0 px-3 py-2 ">Закрыть</a> }
                         <a asp-controller="MyTask" asp-action="MyTask" asp-route-id="@task.Id" type="button" class="btn btn-warning rounded-0 px-3 py-2 ">Детали</a>
-                        <a asp-controller="MyTask" asp-action="Delete" asp-route-id="@task.Id" type="button" class="btn btn-danger rounded-0 px-3 py-2 ">Удалить</a>
+                        @if(task.Status!="Открыта"){ <a asp-controller="MyTask" asp-action="Delete" asp-route-id="@task.Id" type="button" class="btn btn-danger rounded-0 px-3 py-2 ">Удалить</a> }
                     </td>
 
                 </tr>

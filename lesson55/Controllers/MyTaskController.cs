@@ -128,6 +128,7 @@ public class MyTaskController : Controller
             MyTask task = _context.Tasks.FirstOrDefault(t => t.Id == id);
             if (task.Status=="Открыта")
             {
+                task.DateOfClosing = DateTime.UtcNow;
                 task.Status = "Закрыта";
                 _context.SaveChanges();
             }
@@ -142,8 +143,13 @@ public class MyTaskController : Controller
         {
             MyTask task = await _context.Tasks.FirstOrDefaultAsync(p => p.Id == id);
             if (task != null)
-                if (task.Status=="Закрыта"|| task.Status=="Новая")
+            {
+                if (task.Status.Equals("Закрыта") || task.Status.Equals("Навая"))
                     return View(task);
+                else
+                    return RedirectToAction("Index");
+            }
+                
         }
         return NotFound();
     }
