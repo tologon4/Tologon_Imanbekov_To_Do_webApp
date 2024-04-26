@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using lesson55.Models;
@@ -11,9 +12,11 @@ using lesson55.Models;
 namespace lesson55.Migrations
 {
     [DbContext(typeof(MyTaskContext))]
-    partial class MyTaskContextModelSnapshot : ModelSnapshot
+    [Migration("20240426085245_AddedDateOfOpeningToMyTask")]
+    partial class AddedDateOfOpeningToMyTask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

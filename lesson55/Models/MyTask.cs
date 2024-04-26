@@ -12,6 +12,7 @@ public class MyTask
     public string Status { get; set; }
     [Required(ErrorMessage = "Заполните ячейку")]
     public DateTime? DateOfCreation { get; set; }
+    public DateTime? DateOfOpening { get; set; }
     public DateTime? DateOfClosing { get; set; }
     public string Description { get; set; }
 }
