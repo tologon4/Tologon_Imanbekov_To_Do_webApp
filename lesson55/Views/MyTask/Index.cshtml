@@ -99,15 +99,12 @@
             }
             </tbody>
         </table>
-        if (Model.PageViewModel.HasPreviousPage)
-        {
-            <a asp-action="Index" asp-route-page="@(Model.PageViewModel.PageNumber - 1)"> Back </a>
-        }
-
-        if (Model.PageViewModel.HasNextPage)
-        {
-            <a asp-action="Index" asp-route-page="@(Model.PageViewModel.PageNumber + 1)">Next</a>
-        }
+        <div class="col-4 mx-auto text-center">
+            @if (Model.PageViewModel.HasPreviousPage)
+                { <a class="btn btn-primary me-4" asp-action="Index" asp-route-page="@(Model.PageViewModel.PageNumber - 1)"> Предыдущий </a> }
+            @if (Model.PageViewModel.HasNextPage)
+                { <a class="btn btn-primary ms-4" asp-action="Index" asp-route-page="@(Model.PageViewModel.PageNumber + 1)">Следующий</a> }
+        </div>
     }
 </div>
 
