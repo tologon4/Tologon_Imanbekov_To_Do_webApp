@@ -13,14 +13,35 @@ public class MyTaskController : Controller
     {
         _context = context;
     }
-    public async Task<IActionResult> Index(string? priority, string? status, string? titleSearch, DateTime? dateFrom, DateTime? dateTo, string wordFilter,TaskSortState sortState = TaskSortState.NameAsc, int page = 1)
+    public IActionResult Index(string? priority, string? status, string? titleSearch, DateTime? dateFrom, DateTime? dateTo, string? wordFilter,TaskSortState sortState = TaskSortState.NameAsc, int page = 1)
     {
         IQueryable<MyTask> filteredTasks = _context.Tasks;
         ViewBag.Priorities = new List<string>() {"Высокий", "Средний", "Низкий" };
         ViewBag.Statuses = new List<string>() { "Новая", "Открыта", "Закрыта" };
-        
-        /*DateTime? utcDateFrom = dateFrom.HasValue ? dateFrom.Value.ToUniversalTime() : null;
-        DateTime? utcDateTo = dateTo.HasValue ? dateTo.Value.ToUniversalTime() : null;*/
+        if (!string.IsNullOrEmpty(ViewBag.Priority))
+        {
+            priority = ViewBag.Priority;
+        }
+        if (!string.IsNullOrEmpty(ViewBag.Status))
+        {
+            status = ViewBag.Status;
+        }
+        if (!string.IsNullOrEmpty(ViewBag.TitleSearch))
+        {
+            titleSearch = ViewBag.TitleSearch;
+        }
+        if (!string.IsNullOrEmpty(ViewBag.WordFilter))
+        {
+            wordFilter = ViewBag.WordFilter;
+        }
+        if (!string.IsNullOrEmpty(ViewBag.DateTo))
+        {
+            dateTo = ViewBag.DateTo;
+        }
+        if (!string.IsNullOrEmpty(ViewBag.DateFrom))
+        {
+            dateFrom = ViewBag.DateFrom;
+        }
         if (!string.IsNullOrEmpty(priority))
             filteredTasks = filteredTasks.Where(t => t.Priority == priority);
         if (!string.IsNullOrEmpty(status))
@@ -75,7 +96,7 @@ public class MyTaskController : Controller
                 tasks = tasks.OrderBy(t => t.Name).ToList();
                 break;
         }
-        int pageSize = 5;
+        int pageSize = 10;
         int count = tasks.Count();
         var items = tasks.Skip((page - 1) * pageSize).Take(pageSize);
         PageViewModel pvm = new PageViewModel(count, page, pageSize);
@@ -84,6 +105,24 @@ public class MyTaskController : Controller
             PageViewModel = pvm,
             Tasks = items
         };
+        ViewBag.CurrentSort = sortState;
+        ViewBag.CurrentFilter = tasks;
+        ViewBag.Priority = priority;
+        ViewBag.Status = status;
+        ViewBag.TitleSearch = titleSearch;
+        ViewBag.WordFilter = wordFilter;
+        if (dateTo.HasValue)
+        {
+            
+            ViewBag.DateTo = dateTo.Value.ToUniversalTime();
+        }
+
+        if (dateFrom.HasValue)
+        {
+            
+            ViewBag.DateFrom = dateFrom.Value.ToUniversalTime();
+        }
+        
         return View(tivm);
     }
 

@@ -63,10 +63,38 @@
             <thead>
             <tr>
                 <th>Номер</th>
-                <th><a asp-action="Index" asp-route-sortState="@ViewBag.NameSort">Название задачи</a></th>
-                <th><a asp-action="Index" asp-route-sortState="@ViewBag.PrioritySort">Приоритет</a></th>
-                <th><a asp-action="Index" asp-route-sortState="@ViewBag.StatusSort">Статус</a></th>
-                <th><a asp-action="Index" asp-route-sortState="@ViewBag.DateOfCreationSort">Дата создания</a></th>
+                <th><a asp-action="Index"
+                       asp-route-sortState="@ViewBag.NameSort"
+                       asp-route-priority="@ViewBag.Priority"
+                       asp-route-status="@ViewBag.Status"
+                       asp-route-titleSearch="@ViewBag.TitleSearch"
+                       asp-route-dateFrom="@ViewBag.DateFrom"
+                       asp-route-dateTo="@ViewBag.DateTo"
+                       asp-route-wordFilter="@ViewBag.WordFilter">Название задачи</a></th>
+                <th><a asp-action="Index" 
+                       asp-route-sortState="@ViewBag.PrioritySort"
+                       asp-route-priority="@ViewBag.Priority"
+                       asp-route-status="@ViewBag.Status"
+                       asp-route-titleSearch="@ViewBag.TitleSearch"
+                       asp-route-dateFrom="@ViewBag.DateFrom"
+                       asp-route-dateTo="@ViewBag.DateTo"
+                       asp-route-wordFilter="@ViewBag.WordFilter">Приоритет</a></th>
+                <th><a asp-action="Index" 
+                       asp-route-sortState="@ViewBag.StatusSort"
+                       asp-route-priority="@ViewBag.Priority"
+                       asp-route-status="@ViewBag.Status"
+                       asp-route-titleSearch="@ViewBag.TitleSearch"
+                       asp-route-dateFrom="@ViewBag.DateFrom"
+                       asp-route-dateTo="@ViewBag.DateTo"
+                       asp-route-wordFilter="@ViewBag.WordFilter">Статус</a></th>
+                <th><a asp-action="Index" 
+                       asp-route-sortState="@ViewBag.DateOfCreationSort"
+                       asp-route-priority="@ViewBag.Priority"
+                       asp-route-status="@ViewBag.Status"
+                       asp-route-titleSearch="@ViewBag.TitleSearch"
+                       asp-route-dateFrom="@ViewBag.DateFrom"
+                       asp-route-dateTo="@ViewBag.DateTo"
+                       asp-route-wordFilter="@ViewBag.WordFilter">Дата создания</a></th>
                 <th>Действия</th>
             </tr>
             </thead>
@@ -101,9 +129,25 @@
         </table>
         <div class="col-4 mx-auto text-center">
             @if (Model.PageViewModel.HasPreviousPage)
-                { <a class="btn btn-primary me-4" asp-action="Index" asp-route-page="@(Model.PageViewModel.PageNumber - 1)"> Предыдущий </a> }
+            { <a class="btn btn-primary me-4" asp-action="Index"
+                 asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+                 asp-route-sortState="@ViewBag.CurrentSort"
+                 asp-route-priority="@ViewBag.Priority"
+                 asp-route-status="@ViewBag.Status"
+                 asp-route-titleSearch="@ViewBag.TitleSearch"
+                 asp-route-dateFrom="@ViewBag.DateFrom"
+                 asp-route-dateTo="@ViewBag.DateTo"
+                 asp-route-wordFilter="@ViewBag.WordFilter"> Предыдущий </a> }
             @if (Model.PageViewModel.HasNextPage)
-                { <a class="btn btn-primary ms-4" asp-action="Index" asp-route-page="@(Model.PageViewModel.PageNumber + 1)">Следующий</a> }
+            { <a class="btn btn-primary ms-4" asp-action="Index"
+                 asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+                 asp-route-sortState="@ViewBag.CurrentSort"
+                 asp-route-priority="@ViewBag.Priority"
+                 asp-route-status="@ViewBag.Status"
+                 asp-route-titleSearch="@ViewBag.TitleSearch"
+                 asp-route-dateFrom="@ViewBag.DateFrom"
+                 asp-route-dateTo="@ViewBag.DateTo"
+                 asp-route-wordFilter="@ViewBag.WordFilter">Следующий</a> }
         </div>
     }
 </div>
