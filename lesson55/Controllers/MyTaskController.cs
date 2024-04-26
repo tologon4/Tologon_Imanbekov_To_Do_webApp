@@ -136,6 +136,11 @@ public class MyTaskController : Controller
     public IActionResult Create(MyTask task)
     {
         ViewBag.Priorities = new List<string>(){"Высокий", "Средний", "Низкий" };
+        if (_context.Tasks.Any(t => t.Name == task.Name) && _context.Tasks.Any(t => t.ExecutorName == task.ExecutorName))
+        {
+            ModelState.AddModelError("Name", "Задача с таким название уже существует!");
+            return View(task);
+        }
         if (ModelState.IsValid)
         {
             task.DateOfCreation = DateTime.Now.ToUniversalTime();
