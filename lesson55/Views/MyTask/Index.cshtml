@@ -1,5 +1,4 @@
-@model List<MyTask>
-
+@model lesson55.ViewModels.IndexViewModel
 @{
     ViewBag.Title = "Tasks";
     Layout = "_Layout";
@@ -55,7 +54,7 @@
     </form>
     
     
-    @if (@Model.Count == 0)
+    @if (@Model.MyTasks.ToList().Count == 0)
     {
         <p>Пока что, задач еще нет!</p>
     }
@@ -73,7 +72,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var task in @Model)
+            @foreach (var task in @Model.MyTasks)
             {
                 <tr>
                     <td>@task.Id</td>
@@ -94,7 +93,41 @@
         </table>
     }
 </div>
+@if (Model.PageViewModel.HasPreviousPage)
 
+{
+
+    <a asp-action="Index"
+
+        asp-route-page="@(Model.PageViewModel.PageNumber - 1)"
+
+        class="btn btn-default btn">
+
+         <i class="glyphicon glyphicon-chevron-left"></i>
+
+        Назад
+
+    </a>
+
+}
+
+@if (Model.PageViewModel.HasNextPage)
+
+{
+
+    <a asp-action="Index"
+
+        asp-route-page="@(Model.PageViewModel.PageNumber + 1)"
+
+        class="btn btn-default btn">
+
+        Вперед
+
+        <i class="glyphicon glyphicon-chevron-right"></i>
+
+    </a>
+
+}
 @functions{
     public string PriorityColor(string priority)
     {

@@ -3,6 +3,8 @@ using lesson55.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using lesson55.Models;
+using lesson55.ViewModels;
+
 namespace lesson55.Controllers;
 
 public class MyTaskController : Controller
@@ -13,13 +15,12 @@ public class MyTaskController : Controller
     {
         _context = context;
     }
-    public IActionResult Index(string? priority, string? status, string? titleSearch, DateTime? dateFrom, DateTime? dateTo, string wordFilter,TaskSortState sortState = TaskSortState.NameAsc)
+    public async Task<IActionResult> Index(string? priority, string? status, string? titleSearch, DateTime? dateFrom, DateTime? dateTo, string wordFilter,int page = 1,TaskSortState sortState = TaskSortState.NameAsc)
     {
         ViewBag.Priorities = new List<string>() {"Высокий", "Средний", "Низкий" };
         ViewBag.Statuses = new List<string>() { "Новая", "Открыта", "Закрыта" };
+        int pageSize = 5;
         IQueryable<MyTask> filteredTasks = _context.Tasks;
-        /*DateTime? utcDateFrom = dateFrom.HasValue ? dateFrom.Value.ToUniversalTime() : null;
-        DateTime? utcDateTo = dateTo.HasValue ? dateTo.Value.ToUniversalTime() : null;*/
         if (!string.IsNullOrEmpty(priority))
         {
             filteredTasks = filteredTasks.Where(t => t.Priority == priority);
@@ -46,7 +47,7 @@ public class MyTaskController : Controller
             dateTo = dateTo.Value.ToUniversalTime();
             filteredTasks = filteredTasks.Where(t => t.DateOfCreation <= dateTo);
         }
-
+        
         var tasks = filteredTasks.ToList();
         ViewBag.NameSort = sortState == TaskSortState.NameAsc ? TaskSortState.NameDesc : TaskSortState.NameAsc;
         ViewBag.PrioritySort = sortState == TaskSortState.PriorityAsc ? TaskSortState.PriorityDesc : TaskSortState.PriorityAsc;
@@ -79,7 +80,15 @@ public class MyTaskController : Controller
                 tasks = tasks.OrderByDescending(t => t.DateOfCreation).ToList();
                 break;
         }
-        return View(tasks);
+        var count = tasks.Count();
+        var items = tasks.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        PageViewModel pageViewModel = new PageViewModel(count, page, pageSize);
+        IndexViewModel viewModel = new IndexViewModel
+        {
+            PageViewModel = pageViewModel,
+            MyTasks = items
+        };
+        return View(viewModel);
     }
 
     public IActionResult Create()
