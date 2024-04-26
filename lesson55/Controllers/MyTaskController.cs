@@ -150,7 +150,7 @@ public class MyTaskController : Controller
             MyTask task = await _context.Tasks.FirstOrDefaultAsync(p => p.Id == id);
             if (task != null)
             {
-                if (task.Status.Equals("Закрыта") || task.Status.Equals("Навая"))
+                if (!task.Status.Equals("Открыта"))
                     return View(task);
                 else
                     return RedirectToAction("Index");
