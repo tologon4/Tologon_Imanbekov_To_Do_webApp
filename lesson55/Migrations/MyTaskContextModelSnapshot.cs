@@ -37,6 +37,9 @@ namespace lesson55.Migrations
                         .IsRequired()
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("DateOfOpening")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");

@@ -13,29 +13,22 @@ public class MyTaskController : Controller
     {
         _context = context;
     }
-    public IActionResult Index(string? priority, string? status, string? titleSearch, DateTime? dateFrom, DateTime? dateTo, string wordFilter,TaskSortState sortState = TaskSortState.NameAsc)
+    public async Task<IActionResult> Index(string? priority, string? status, string? titleSearch, DateTime? dateFrom, DateTime? dateTo, string wordFilter,TaskSortState sortState = TaskSortState.NameAsc, int page = 1)
     {
+        IQueryable<MyTask> filteredTasks = _context.Tasks;
         ViewBag.Priorities = new List<string>() {"Высокий", "Средний", "Низкий" };
         ViewBag.Statuses = new List<string>() { "Новая", "Открыта", "Закрыта" };
-        IQueryable<MyTask> filteredTasks = _context.Tasks;
+        
         /*DateTime? utcDateFrom = dateFrom.HasValue ? dateFrom.Value.ToUniversalTime() : null;
         DateTime? utcDateTo = dateTo.HasValue ? dateTo.Value.ToUniversalTime() : null;*/
         if (!string.IsNullOrEmpty(priority))
-        {
             filteredTasks = filteredTasks.Where(t => t.Priority == priority);
-        }
         if (!string.IsNullOrEmpty(status))
-        {
             filteredTasks = filteredTasks.Where(t => t.Status == status);
-        }
         if (!string.IsNullOrEmpty(titleSearch))
-        {
             filteredTasks = filteredTasks.Where(t => t.Name.Equals(titleSearch));
-        }
         if (!string.IsNullOrEmpty(wordFilter))
-        {
             filteredTasks = filteredTasks.Where(t => t.Description.Contains(wordFilter.ToLower()));
-        }
         if (dateFrom.HasValue)
         {
             dateFrom = dateFrom.Value.ToUniversalTime();
@@ -78,8 +71,20 @@ public class MyTaskController : Controller
             case TaskSortState.DateOfCreationDesc:
                 tasks = tasks.OrderByDescending(t => t.DateOfCreation).ToList();
                 break;
+            default:
+                tasks = tasks.OrderBy(t => t.Name).ToList();
+                break;
         }
-        return View(tasks);
+        int pageSize = 5;
+        int count = tasks.Count();
+        var items = tasks.Skip((page - 1) * pageSize).Take(pageSize);
+        PageViewModel pvm = new PageViewModel(count, page, pageSize);
+        TaskIndexViewModel tivm = new TaskIndexViewModel()
+        {
+            PageViewModel = pvm,
+            Tasks = items
+        };
+        return View(tivm);
     }
 
     public IActionResult Create()
@@ -114,6 +119,7 @@ public class MyTaskController : Controller
             MyTask task = _context.Tasks.FirstOrDefault(t => t.Id == id);
             if (task.Status == "Новая")
             {
+                task.DateOfOpening = DateTime.UtcNow;
                 task.Status = "Открыта";
                 _context.SaveChanges();
             }
