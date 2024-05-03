@@ -162,6 +162,9 @@ namespace lesson55.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CreatorId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("DateOfClosing")
                         .HasColumnType("timestamp with time zone");
 
@@ -176,9 +179,8 @@ namespace lesson55.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ExecutorName")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int?>("ExecutorId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -193,6 +195,10 @@ namespace lesson55.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("ExecutorId");
 
                     b.ToTable("Tasks");
                 });
@@ -313,6 +319,21 @@ namespace lesson55.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("lesson55.Models.MyTask", b =>
+                {
+                    b.HasOne("lesson55.Models.User", "Creator")
+                        .WithMany()
+                        .HasForeignKey("CreatorId");
+
+                    b.HasOne("lesson55.Models.User", "Executor")
+                        .WithMany()
+                        .HasForeignKey("ExecutorId");
+
+                    b.Navigation("Creator");
+
+                    b.Navigation("Executor");
                 });
 #pragma warning restore 612, 618
         }

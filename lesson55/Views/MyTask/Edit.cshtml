@@ -1,12 +1,12 @@
 @model MyTask
 
 @{
-    ViewBag.Title = "Task Create";
+    ViewBag.Title = "Task Edit";
     Layout = "_Layout";
 }
 
-<h3 class="text-center mt-4">Заполните форму, чтобы добавить задачу</h3>
-<form asp-action="Create" method="post" class="connection-form">
+<h3 class="text-center mt-4">Заполните форму, чтобы редактировать задачу</h3>
+<form asp-action="Edit" method="post" class="connection-form">
 @Html.ValidationSummary(true)
     <div class="row  mt-5">
         <div class="col col-6 mx-auto">
@@ -30,9 +30,11 @@
                 <label for="descr">Описание задачи<span class="text-danger ms-2" asp-validation-for="Description"></span></label>
                 <textarea id="descr" placeholder="Подробное описание" class="form-control form-control-lg mt-3  h-100" asp-for="Description" type="text" rows="3"></textarea>
             </div>
-            <input asp-for="Status" value="Новая" type="hidden"/>
-            <input asp-for="DateOfCreation" value="@DateTime.UtcNow" type="hidden"/>
-            <button type="submit" class="btn btn-success mt-5 px-3">Добавить Задачу</button>
+            <input asp-for="Status" value="@Model.Status" type="hidden" />
+            <input asp-for="DateOfCreation" value="@Model.DateOfCreation" type="hidden" />
+            <input asp-for="ExecutorId" value="@Model.ExecutorId" type="hidden" />
+            <input asp-for="CreatorId" value="@Model.CreatorId" type="hidden" />
+            <button type="submit" class="btn btn-success mt-5 px-3">Редактировать Задачу</button>
         </div>
     </div>
 </form>

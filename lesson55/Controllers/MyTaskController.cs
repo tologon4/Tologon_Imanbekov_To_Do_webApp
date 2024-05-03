@@ -11,18 +11,16 @@ namespace lesson55.Controllers;
 public class MyTaskController : Controller
 {
     public MyTaskContext _context;
-    private readonly UserManager<User> _userManager;
-    private readonly SignInManager<User> _signInManager;
+    private UserManager<User> _userManager;
 
-    public MyTaskController(MyTaskContext context, UserManager<User> userManager, SignInManager<User> signInManager)
+    public MyTaskController(MyTaskContext context, UserManager<User> userManager)
     {
         _context = context;
         _userManager = userManager;
-        _signInManager = signInManager;
     }
     public async Task<IActionResult> Index(string? priority, string? status, string? titleSearch, DateTime? dateFrom, DateTime? dateTo, string? wordFilter,TaskSortState sortState = TaskSortState.NameAsc, int page = 1)
     {
-        IQueryable<MyTask> filteredTasks = _context.Tasks;
+        IQueryable<MyTask> filteredTasks = _context.Tasks.Include(u => u.Creator).Include(u => u.Executor);
         ViewBag.Priorities = new List<string>() {"Высокий", "Средний", "Низкий" };
         ViewBag.Statuses = new List<string>() { "Новая", "Открыта", "Закрыта" };
         if (!string.IsNullOrEmpty(ViewBag.Priority))
@@ -37,6 +35,7 @@ public class MyTaskController : Controller
             dateTo = ViewBag.DateTo;
         if (!string.IsNullOrEmpty(ViewBag.DateFrom))
             dateFrom = ViewBag.DateFrom;
+        
         List<MyTask> tasks = await FilterSort(filteredTasks,  priority,  status,  titleSearch,  dateFrom,  dateTo,  wordFilter,  sortState);
         int pageSize = 1;
         int count = tasks.Count();
@@ -57,6 +56,7 @@ public class MyTaskController : Controller
             ViewBag.DateTo = dateTo.Value.ToUniversalTime();
         if (dateFrom.HasValue)
             ViewBag.DateFrom = dateFrom.Value.ToUniversalTime();
+        
         return View(tivm);
     }
 
@@ -119,13 +119,9 @@ public class MyTaskController : Controller
         return tasks;
     }
 
-    [Authorize]
-    public async Task<IActionResult> Create()
+    public IActionResult Create()
     {
         ViewBag.Priorities = new List<string>() {"Высокий", "Средний", "Низкий" };
-        string userId = _userManager.GetUserId(User);
-        User user = await _userManager.FindByIdAsync(userId);
-        ViewBag.User = user;
         return View();
     }
 
@@ -133,16 +129,9 @@ public class MyTaskController : Controller
     public IActionResult Create(MyTask task)
     {
         ViewBag.Priorities = new List<string>(){"Высокий", "Средний", "Низкий" };
-        int? userId = int.Parse(_userManager.GetUserId(User));
-        User user = _context.Users.FirstOrDefault(u => u.Id == userId);
-        ViewBag.User = user;
-        if (_context.Tasks.Any(t => t.Name == task.Name) && _context.Tasks.Any(t => t.ExecutorId == userId))
-        {
-            ModelState.AddModelError("", "Задача с таким название уже существует!");
-            return View(task);
-        }
         if (ModelState.IsValid)
         {
+            task.CreatorId = int.Parse(_userManager.GetUserId(User));
             task.DateOfCreation = DateTime.Now.ToUniversalTime();
             _context.Tasks.Add(task);
             _context.SaveChanges();
@@ -152,51 +141,76 @@ public class MyTaskController : Controller
     }
 
     [Authorize]
+    public IActionResult TakeTask(int id)
+    {
+        int userId = Convert.ToInt32(_userManager.GetUserId(User));
+        if (id != null)
+        {
+            var task = _context.Tasks.FirstOrDefault(t => t.Id == id);
+            if (task.ExecutorId == null)
+            {
+                task.ExecutorId = userId;
+                _context.Update(task);
+                _context.SaveChanges();
+                return RedirectToAction("MyTask", task);
+            }
+        }
+        return NotFound();
+    }
+    
     public IActionResult MyTask(int id)
     {
-        var tasks = _context.Tasks.Include(u => u.Creator).Include(u => u.Executor).ToList();
-        var task = tasks.FirstOrDefault(t => t.Id == id);
-        int? userId = Convert.ToInt32(_userManager.GetUserId(User));
-        if (userId != null)
+        ViewBag.UserId = int.Parse(_userManager.GetUserId(User));
+        return View(_context.Tasks.Include(u => u.Creator).Include(u => u.Executor).FirstOrDefault(t => t.Id == id));
+    }
+
+    public IActionResult Edit(int? id)
+    {
+        ViewBag.Priorities = new List<string>(){"Высокий", "Средний", "Низкий" };
+        return View(_context.Tasks.FirstOrDefault(t => t.Id ==id));
+    }
+
+    [HttpPost]
+    public IActionResult Edit(MyTask task, int id)
+    {
+        ViewBag.Priorities = new List<string>(){"Высокий", "Средний", "Низкий" };
+        if (ModelState.IsValid)
         {
-            ViewBag.UserId = userId;
+            task.Id = id;
+            _context.Update(task);
+            _context.SaveChanges();
+            return RedirectToAction("MyTask", new { id = id });
         }
         return View(task);
     }
-    
-    [Authorize]
     public IActionResult Open(int? id)
     {
         if (id != null)
         {
             MyTask task = _context.Tasks.FirstOrDefault(t => t.Id == id);
-            int userId = Convert.ToInt32(_userManager.GetUserId(User));
-            if (task.Status == "Новая" && task.ExecutorId != null && (task.ExecutorId == userId || User.IsInRole("admin")))
+            if (task.Status == "Новая" && task.CreatorId != int.Parse(_userManager.GetUserId(User)))
             {
                 task.DateOfOpening = DateTime.UtcNow;
                 task.Status = "Открыта";
                 _context.SaveChanges();
-                return RedirectToAction("Index");
             }
         }
-        return NotFound();
+        return RedirectToAction("Index");
     }
-    [Authorize]
+
     public IActionResult Close(int? id)
     {
         if (id != null)
         {
             MyTask task = _context.Tasks.FirstOrDefault(t => t.Id == id);
-            int userId = Convert.ToInt32(_userManager.GetUserId(User));
-            if (task.Status=="Открыта" && task.ExecutorId != null && (task.ExecutorId == userId || User.IsInRole("admin")))
+            if (task.Status=="Открыта" && task.CreatorId != int.Parse(_userManager.GetUserId(User)))
             {
                 task.DateOfClosing = DateTime.UtcNow;
                 task.Status = "Закрыта";
                 _context.SaveChanges();
-                return RedirectToAction("Index");
             }
         }
-        return NotFound();
+        return RedirectToAction("Index");
     }
     [HttpGet]
     [ActionName("Delete")]
@@ -205,9 +219,7 @@ public class MyTaskController : Controller
         if (id != null)
         {
             MyTask task = await _context.Tasks.FirstOrDefaultAsync(p => p.Id == id);
-            string userId = _userManager.GetUserId(User);
-            User user = await _userManager.FindByIdAsync(userId);
-            if (task != null && (task.CreatorId == user.Id || User.IsInRole("admin")))
+            if (task != null)
             {
                 if (!task.Status.Equals("Открыта"))
                     return View(task);
@@ -228,23 +240,6 @@ public class MyTaskController : Controller
             _context.Entry(task).State = EntityState.Deleted;
             await _context.SaveChangesAsync();
             return RedirectToAction("Index");
-        }
-        return NotFound();
-    }
-    [Authorize]
-    public IActionResult TakeTask(int id)
-    {
-        int userId = int.Parse(_userManager.GetUserId(User));
-        if (id != null)
-        {
-            var task = _context.Tasks.FirstOrDefault(t => t.Id == id);
-            if (task.ExecutorId == null)
-            {
-                task.ExecutorId = userId;
-                _context.Update(task);
-                _context.SaveChanges();
-                return RedirectToAction("MyTask", task);
-            }
         }
         return NotFound();
     }
