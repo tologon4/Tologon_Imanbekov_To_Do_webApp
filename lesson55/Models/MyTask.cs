@@ -17,4 +17,9 @@ public class MyTask
     public DateTime? DateOfOpening { get; set; }
     public DateTime? DateOfClosing { get; set; }
     public string Description { get; set; }
+    public int? ExecutorId { get; set; }
+    public User? Executor { get; set; }
+    public int CreatorId { get; set; }
+    public User? Creator { get; set; }
+    
 }

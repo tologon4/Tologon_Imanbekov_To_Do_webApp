@@ -25,6 +25,24 @@
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="MyTask" asp-action="Create">Добавить Задачу</a>
                     </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <span class="nav-link text-dark">@User.Identity.Name</span>
+                        </li>
+                        <li class="nav-item">
+                            <form method="post" asp-controller="Account" asp-action="LogOut"><input type="submit" class="nav-link text-dark" value="Выход" /></form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Account" asp-action="LogIn">Вход</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark"  asp-area="" asp-controller="Account" asp-action="Register">Регистрация</a>
+                        </li>
+                    }
                     
                 </ul>
             </div>

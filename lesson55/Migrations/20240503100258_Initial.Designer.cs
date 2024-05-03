@@ -12,8 +12,8 @@ using lesson55.Models;
 namespace lesson55.Migrations
 {
     [DbContext(typeof(MyTaskContext))]
-    [Migration("20240426085245_AddedDateOfOpeningToMyTask")]
-    partial class AddedDateOfOpeningToMyTask
+    [Migration("20240503100258_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,10 @@ namespace lesson55.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ExecutorName")
                         .IsRequired()
                         .HasColumnType("text");
 
